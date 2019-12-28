@@ -137,7 +137,7 @@ def DPS_Preference(inputs):
     pref_count = 0  # Keeps track of how many preferences are in the dataset
 
     while iteration < max_iter and not converged:
-        
+
         skip = False; # check whether there is a preference
 
         print('GPR, noise param %.2f, run %i: count = %i,pref_count: %d'% (preference_noise,
@@ -146,7 +146,6 @@ def DPS_Preference(inputs):
         y = trajectory_return_labels[:pref_count,1]     # index of preferred trajectory, 0 or 1
 
         # Call feedback function to update the GP model:
-        print('new data')
         GP_model = feedback(X, y, GP_prior_cov_inv, preference_noise)
         # dirichlet_posterior = dirichlet_posterior
 
