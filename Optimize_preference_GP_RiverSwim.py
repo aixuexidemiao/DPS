@@ -50,7 +50,7 @@ def DPS_Preference(inputs):
     epsilon = inputs[3]
     run_num = inputs[4]
     save_folder = inputs[5]
-    seed = inputs[6]
+    seed = 1032807963 #inputs[6]
     finite_horizon_iteration = inputs[7]
     max_iter = inputs[8]
 
