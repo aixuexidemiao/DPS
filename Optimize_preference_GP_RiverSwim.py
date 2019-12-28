@@ -136,23 +136,19 @@ def DPS_Preference(inputs):
     iteration = 0
     pref_count = 0  # Keeps track of how many preferences are in the dataset
 
-    skip = False; # check whether there is a preference
-
     while iteration < max_iter and not converged:
+        
+        skip = False; # check whether there is a preference
 
         print('GPR, noise param %.2f, run %i: count = %i,pref_count: %d'% (preference_noise,
                                                        run_num, iteration + 1,pref_count))
         X = visitation_difference_matrix[:pref_count,:]
         y = trajectory_return_labels[:pref_count,1]     # index of preferred trajectory, 0 or 1
 
-        if not skip:
-            # to save time, if skip, same data to feedback
-            # Call feedback function to update the GP model:
-            print('new data')
-            GP_model = feedback(X, y, GP_prior_cov_inv, preference_noise)
-            # dirichlet_posterior = dirichlet_posterior
-        else:
-            print("data does not change")
+        # Call feedback function to update the GP model:
+        print('new data')
+        GP_model = feedback(X, y, GP_prior_cov_inv, preference_noise)
+        # dirichlet_posterior = dirichlet_posterior
 
         # Sample policies:
         policies, reward_models = advance(num_policies, dirichlet_posterior,
@@ -223,7 +219,6 @@ def DPS_Preference(inputs):
         iteration += 1
         if not skip:
             pref_count += 1
-            skip = False
 
         # Save results from this iteration:
         if np.mod(iteration, max_iter) == 0:
