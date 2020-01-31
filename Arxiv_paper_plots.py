@@ -4,6 +4,11 @@ Created on Thu May 23 08:21:05 2019
 
 @author: Ellen
 """
+'''
+1.读取mat文件们，同一参数(alg_pref_noise)的不同runs,
+2.计算mean，variance
+3.plot
+'''
 
 import numpy as np
 import matplotlib.pyplot as plt

@@ -1,11 +1,9 @@
 
 """
+using the sigmoid link function
 """
-import os
-import scipy.io as io
 
 import numpy as np
-from scipy.stats import norm
 from scipy.optimize import minimize
 from ValueIteration import value_iteration
 
@@ -165,18 +163,9 @@ def preference_GP_objective(f, visitation_difference_matrix, labels, GP_prior_co
         if label == 0.5 or not np.any(visits): # if visit is not all zeros
             continue
 
-        sum = 0
-        sqr = 0
-        for i in range(visitation_difference_matrix.shape[1]):
-            sum += visits[i] * f[i]
-            sqr += visits[i] ** 2
+        z = np.dot(visits,f) / preference_noise
 
-        z = sum / (preference_noise * np.sqrt(sqr))
-
-        if norm.cdf(z) < 1e-10:
-            obj -= np.log(norm.cdf(z)+1e-10)
-        else:
-            obj -= np.log(norm.cdf(z))
+        obj -= np.log(sigmoid(z))
 
     return obj
 
@@ -200,9 +189,8 @@ def preference_GP_gradient(f, visitation_difference_matrix, labels, GP_prior_cov
     num_preferences = visitation_difference_matrix.shape[0]
     num_sa_pair = visitation_difference_matrix.shape[1]
 
-    for m in range(grad.shape[0]):
+    for m in range(num_sa_pair):
 
-        value = 0
         for k in range(num_preferences):   # Go through each pair of preference
 
             label = int(labels[k])
@@ -211,20 +199,10 @@ def preference_GP_gradient(f, visitation_difference_matrix, labels, GP_prior_cov
             if label == 0.5 or not np.any(visits):
                 continue
 
-            sum = 0
-            sqr = 0
-            for i in range(num_sa_pair):
-                sum += visits[i] * f[i]
-                sqr += visits[i]**2
-            z = sum / (preference_noise * np.sqrt(sqr))
+            z_k = np.dot(visits,f) / preference_noise
 
+            grad[m] -= (sigmoid_der(z_k) / sigmoid(z_k)) / preference_noise * visits[m]
 
-            if norm.cdf(z) < 1e-10:
-                value += (norm.pdf(z) / (norm.cdf(z)+1e-10)) / (sqr * preference_noise) * visits[m]
-            else:
-                value += (norm.pdf(z) / norm.cdf(z)) / (sqr * preference_noise) * visits[m]
-
-        grad[m] -= value
     return grad
 
 def preference_GP_hessian(f, visitation_difference_matrix, labels, GP_prior_cov_inv, preference_noise):
@@ -253,17 +231,43 @@ def preference_GP_hessian(f, visitation_difference_matrix, labels, GP_prior_cov_
 
         if label == 0.5 or not np.any(visits):
             continue
-        sum = 0
-        sqr = 0
-        for i in range(num_sa_pair):
-            sum += visits[i] * f[i]
-            sqr += visits[i] **2
-        z = sum / (preference_noise * np.sqrt(sqr))
 
-        c = (norm.pdf(z) / norm.cdf(z)) / sqr * (z + norm.pdf(z) / norm.cdf(z))
+        z_k = np.dot(visits,f) / preference_noise
+
+        c = 1/preference_noise**2 * ( -(sigmoid_2nd_der(z_k)/sigmoid(z_k)) + (sigmoid_der(z_k)/sigmoid(z_k))**2)
 
         Lambda += c * visits.reshape((num_sa_pair,1)) @ visits.reshape((1,num_sa_pair))
 
     return GP_prior_cov_inv + Lambda
 
+
+def sigmoid(x):
+    """
+    Evaluates the sigmoid function at the specified value.
+    Input: x = any scalar
+    Output: the sigmoid function evaluated at x.
+    """
+    # Refine to solve the runtime warning: overflow
+    if x>=0:
+        return 1.0/(1+np.exp(-x))
+    else:
+        return np.exp(x)/(1+np.exp(x))
+
+def sigmoid_der(x):
+    """
+    Evaluates the sigmoid function's derivative at the specified value.
+    Input: x = any scalar
+    Output: the sigmoid function's derivative evaluated at x.
+    """
+
+    return np.exp(-x) / (1 + np.exp(-x))**2
+
+def sigmoid_2nd_der(x):
+    """
+    Evaluates the sigmoid function's 2nd derivative at the specified value.
+    Input: x = any scalar
+    Output: the sigmoid function's 2nd derivative evaluated at x.
+    """
+
+    return (-np.exp(-x) + np.exp(-2 * x)) / (1 + np.exp(-x))**3
 

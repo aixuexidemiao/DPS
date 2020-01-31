@@ -15,7 +15,7 @@ num_actions = 2
 
 # Finite or infinite-horizon value iteration?
 finite_horizon_iteration = True
-iteration = 200
+iteration = 600
 
 time_horizon = 50
 num_policies = 2  # Num. policies to request from advance function at a time
@@ -84,7 +84,7 @@ for args in args_list:
     DPS_Preference(args)
 
 
-''' 2 Plot'''
+''' 2 Plot
 
 preference_noise = 0.01
 
@@ -97,3 +97,4 @@ filename_part1 = save_folder + 'Iter_' + str(iteration) + '_RBF_' + \
 filename_part2 = '.mat'
 
 #plot_cumulative_reward(filename_part1, filename_part2, num_steps, run_nums, fig_num, True, False, 'blue')
+'''

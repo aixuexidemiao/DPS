@@ -201,7 +201,7 @@ class RiverSwimPreferenceEnv(RiverSwimEnv):
         else:   # Logistic noise model
             
             # Probability of preferring the 2nd trajectory:
-            prob = 1 / (1 + np.exp(-noise_param * (returns[1] - returns[0])))
+            prob = 1 / (1 + np.exp(-noise_param * (returns[1] - returns[0])))  #np.exp(noise_param * (returns[1] - returns[0])) / (1 + np.exp(noise_param * (returns[1] - returns[0])))
             # larger noise_paran, less noisy
             
             preference = np.random.choice([0, 1], p = [1 - prob, prob])

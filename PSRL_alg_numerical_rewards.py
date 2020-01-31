@@ -30,7 +30,7 @@ num_policies = 1  # Num. policies to request from advance function at a time
 # Number of times to run each policy:
 num_policy_runs = 1
 
-epsilon = 0       # Do not use epsilon-greedy control
+epsilon = 0      # Do not use epsilon-greedy control
 
 """
 This function contains the code of the PSRL algorithm.
@@ -238,7 +238,7 @@ sequentially.
 """    
 args_list = []      # List of arguments for the processes that we will run
 
-run_nums = np.arange(100)    # Number of runs for each set of parameter values
+run_nums = np.arange(1)    # Number of runs for each set of parameter values
 
 # Prior parameters:
 diri_prior = 1
